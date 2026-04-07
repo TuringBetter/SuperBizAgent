@@ -46,6 +46,7 @@ func NewMilvusClient(ctx context.Context) (cli.Client, error) {
 		return nil, fmt.Errorf("failed to connect to agent database: %w", err)
 	}
 	// 4. 检查biz collection是否存在，不存在则创建
+	// collection相当于mysql的表
 	collections, err := agentClient.ListCollections(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list collections: %w", err)

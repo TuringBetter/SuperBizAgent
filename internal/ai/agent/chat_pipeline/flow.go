@@ -8,6 +8,7 @@ import (
 	"github.com/cloudwego/eino/flow/agent/react"
 )
 
+// 配置并组装一个带有工具调用能力的 ReAct Agent
 func newReactAgentLambda(ctx context.Context) (lba *compose.Lambda, err error) {
 	config := &react.AgentConfig{
 		MaxStep:            25,

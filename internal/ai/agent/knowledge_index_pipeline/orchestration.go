@@ -14,16 +14,19 @@ func BuildKnowledgeIndexing(ctx context.Context) (r compose.Runnable[document.So
 		MilvusIndexer    = "MilvusIndexer"
 	)
 	g := compose.NewGraph[document.Source, []string]()
+	// 添加文件加载器节点
 	fileLoaderKeyOfLoader, err := newLoader(ctx)
 	if err != nil {
 		return nil, err
 	}
 	_ = g.AddLoaderNode(FileLoader, fileLoaderKeyOfLoader)
+	// 添加文档转换器节点
 	markdownSplitterKeyOfDocumentTransformer, err := newDocumentTransformer(ctx)
 	if err != nil {
 		return nil, err
 	}
 	_ = g.AddDocumentTransformerNode(MarkdownSplitter, markdownSplitterKeyOfDocumentTransformer)
+	// 添加索引器节点
 	milvusIndexerKeyOfIndexer, err := newIndexer(ctx)
 	if err != nil {
 		return nil, err
@@ -33,6 +36,7 @@ func BuildKnowledgeIndexing(ctx context.Context) (r compose.Runnable[document.So
 	_ = g.AddEdge(MilvusIndexer, compose.END)
 	_ = g.AddEdge(FileLoader, MarkdownSplitter)
 	_ = g.AddEdge(MarkdownSplitter, MilvusIndexer)
+	// compose.WithNodeTriggerMode(compose.AnyPredecessor): 只要有一个前置节点执行了，就会执行当前节点
 	r, err = g.Compile(ctx, compose.WithGraphName("KnowledgeIndexing"), compose.WithNodeTriggerMode(compose.AnyPredecessor))
 	if err != nil {
 		return nil, err
